@@ -4,11 +4,28 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+var mongo = require('mongodb').MongoClient;
 
 var usuarios = require("./routes/usuarios");
 
 var app = express();
 
+var mDB;
+mongo.connect("mongodb://localhost:27017/usuariosDB",function(err,db){
+  if(err){
+    console.log("Error al conectarse a mongo")
+  }
+  else{
+    console.log("Conexion exitosa!")
+    mDB = db;
+  }
+});
+
+//creacion de middleware
+app.use(function(req, res, next){
+  req.db = mDB;
+  next();
+});
 // view engine setup
 //app.set('views', path.join(__dirname, 'views'));
 //app.set('view engine', 'jade');
