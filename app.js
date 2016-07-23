@@ -7,6 +7,7 @@ var bodyParser = require('body-parser');
 var mongo = require('mongodb').MongoClient;
 
 var usuarios = require("./routes/usuarios");
+var api = require("./routes/api");
 
 var app = express();
 
@@ -22,7 +23,8 @@ mongo.connect("mongodb://localhost:27017/usuariosDB",function(err,db){
 });
 
 //creacion de middleware
-app.use(function(req, res, next){
+app.use(function(req, res, next
+){
   req.db = mDB;
   next();
 });
@@ -40,7 +42,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 
 app.use("/usuarios",usuarios);
-
+app.use("/api",api);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
