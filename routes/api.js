@@ -32,7 +32,34 @@ router.delete("/:collection/:id", function (req, res, next) {
 });
 
 router.get("/:collection", function (req, res, next){
-    req.c.find().toArray(function(error, result){
+    var q = req.query.q;
+    var limit = req.query.limit;
+    var skip = req.query.skip;
+    var sort = req.query.sort;
+
+    if(q){
+        q = JSON.parse(q);
+    }
+
+    if(limit){
+        limit = parseInt(limit);
+    }
+    else{
+        limit = 0;
+    }
+
+    if(skip){
+        skip = parseInt(skip);
+    }
+    else{
+        skip = 0;
+    }
+
+    if(sort){
+        sort = JSON.parse(sort);
+    }
+
+    req.c.find(q).limit(limit).skip(skip).sort(sort).toArray(function(error, result){
         if(error){
             res.send([]);
         }
@@ -55,13 +82,44 @@ router.get("/:collection/:id", function(req, res, next){
 });
 
 router.put(":/collection/:id",function(req, res, next){
-    var od = new mId(req.params.id);
+    var id = new mId(req.params.id);
     var obj = req.body;
     req.c.update({_id:id},{$set:obj}, function(error, result){
         if(error){
             res.send({success:false});
         }
         else{
+            res.send({success:true});
+        }
+    });
+});
+//agregar item a un arreglo
+//Body: {campo:obj} o  {campo:[objs]}
+//Ejemplo: {"celulares":"454"}
+router.put("/:collection/:id/push", function(req, res, next){
+    var id = new mId(req.params.id);
+    var obj = req.body;
+
+    req.c.update({_id:id},{$push:obj}, function(err, result){
+        if(err){
+            res.send({success:false});
+        }else{
+            res.send({success:true});
+        }
+    });
+
+});
+//eliminar item de un arreglo
+//Body: {campo:{criterio}} o  {campo:valor}
+//Ejemplo: {"celulares":"454"}, {"mascotas":{"nombre":"luna"}}
+router.put("/:collection/:id/pull", function(req, res, next){
+    var id = new mId(req.params.id);
+    var obj = req.body;
+
+    req.c.update({_id:id}, {$pull:obj}, function(err, result){
+        if(err){
+            res.send({success:false});
+        }else{
             res.send({success:true});
         }
     });
